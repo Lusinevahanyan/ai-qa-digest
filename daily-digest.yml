@@ -1,0 +1,24 @@
+# Put this file in your repo at: .github/workflows/daily-digest.yml
+name: Daily Influencer Digest
+
+on:
+  schedule:
+    # Cron is in UTC. 19:30 UTC = 23:30 Yerevan (UTC+4),
+    # late enough to catch almost the whole day's posts.
+    - cron: "30 19 * * *"
+  workflow_dispatch: {}   # lets YOU test it manually; the daily run is automatic
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - run: python digest.py
+        env:
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
